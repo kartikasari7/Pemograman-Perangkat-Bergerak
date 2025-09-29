@@ -8,7 +8,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Form Mahasiswa - Bagian 1',
+      title: 'Form Mahasiswa - Multi Step',
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
@@ -99,7 +99,7 @@ class _FormMahasiswaPageState extends State<FormMahasiswaPage> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Ringkasan Data (Bagian 1)'),
+        title: const Text('Ringkasan Data'),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,31 +118,22 @@ class _FormMahasiswaPageState extends State<FormMahasiswaPage> {
     );
   }
 
-  Widget _sectionTitle(String text) => Padding(
-        padding: const EdgeInsets.only(bottom: 8, top: 8),
-        child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-      );
-
   @override
   Widget build(BuildContext context) {
     final steps = <Step>[
       Step(
         title: const Text('Identitas'),
-        isActive: true,
-        state: StepState.indexed,
+        isActive: _currentStep >= 0,
+        state: _currentStep > 0 ? StepState.complete : StepState.indexed,
         content: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _sectionTitle('Data Pribadi'),
             TextFormField(
               controller: cNama,
               decoration: const InputDecoration(
                 labelText: 'Nama Lengkap',
-                hintText: 'cth: Aulia Rahman',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.person),
               ),
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Nama wajib diisi' : null,
+              validator: (v) => (v == null || v.isEmpty) ? 'Nama wajib diisi' : null,
             ),
             const SizedBox(height: 10),
             TextFormField(
@@ -150,11 +141,9 @@ class _FormMahasiswaPageState extends State<FormMahasiswaPage> {
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
                 labelText: 'NPM',
-                hintText: 'cth: 221234567',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.badge),
               ),
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'NPM wajib diisi' : null,
+              validator: (v) => (v == null || v.isEmpty) ? 'NPM wajib diisi' : null,
             ),
             const SizedBox(height: 10),
             TextFormField(
@@ -162,24 +151,29 @@ class _FormMahasiswaPageState extends State<FormMahasiswaPage> {
               keyboardType: TextInputType.emailAddress,
               decoration: const InputDecoration(
                 labelText: 'Email',
-                hintText: 'cth: nama@kampus.ac.id',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.email),
               ),
               validator: (v) {
-                if (v == null || v.trim().isEmpty) return 'Email wajib diisi';
-                final ok = RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(v.trim());
+                if (v == null || v.isEmpty) return 'Email wajib diisi';
+                final ok = RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(v);
                 return ok ? null : 'Format email tidak valid';
               },
             ),
-            const SizedBox(height: 10),
+          ],
+        ),
+      ),
+      Step(
+        title: const Text('Data Tambahan'),
+        isActive: _currentStep >= 1,
+        state: _currentStep > 1 ? StepState.complete : StepState.indexed,
+        content: Column(
+          children: [
             TextFormField(
               controller: cAlamat,
               maxLines: 2,
               decoration: const InputDecoration(
                 labelText: 'Alamat',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.home),
               ),
             ),
             const SizedBox(height: 10),
@@ -205,26 +199,50 @@ class _FormMahasiswaPageState extends State<FormMahasiswaPage> {
           ],
         ),
       ),
+      Step(
+        title: const Text('Ringkasan'),
+        isActive: _currentStep >= 2,
+        state: StepState.indexed,
+        content: const Text('Klik tombol SIMPAN untuk melihat ringkasan data.'),
+      ),
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Form Mahasiswa — Bagian 1')),
+      appBar: AppBar(title: const Text('Form Mahasiswa — Multi Step')),
       body: Form(
         key: _formKey,
         child: Stepper(
           type: StepperType.vertical,
           currentStep: _currentStep,
           steps: steps,
-          onStepContinue: _simpan,
-          onStepCancel: null,
+          onStepContinue: () {
+            if (_currentStep == 0) {
+              if (!_formKey.currentState!.validate()) return;
+            }
+            if (_currentStep < steps.length - 1) {
+              setState(() => _currentStep++);
+            } else {
+              _simpan();
+            }
+          },
+          onStepCancel: () {
+            if (_currentStep > 0) {
+              setState(() => _currentStep--);
+            }
+          },
           controlsBuilder: (context, details) {
             return Row(
               children: [
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.check),
-                  label: const Text('Simpan'),
+                ElevatedButton(
                   onPressed: details.onStepContinue,
+                  child: Text(_currentStep == steps.length - 1 ? 'Simpan' : 'Lanjut'),
                 ),
+                const SizedBox(width: 10),
+                if (_currentStep > 0)
+                  OutlinedButton(
+                    onPressed: details.onStepCancel,
+                    child: const Text('Kembali'),
+                  ),
               ],
             );
           },

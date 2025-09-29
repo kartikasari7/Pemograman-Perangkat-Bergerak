@@ -3,6 +3,8 @@ import 'form_mahasiswa.dart';
 import 'daftar_mahasiswa.dart';
 import 'tentang_aplikasi.dart';
 import 'pengaturan.dart';
+import 'form_dosen.dart';
+import 'form_matkul.dart';
 
 void main() => runApp(const MyApp());
 
@@ -52,6 +54,22 @@ class HomePage extends StatelessWidget {
               onTap: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (_) => const DaftarMahasiswaPage()));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.badge),
+              title: const Text('Form Dosen'),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const FormDosen()));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.book),
+              title: const Text('Form Mata Kuliah'),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const FormMatkul()));
               },
             ),
             ListTile(
