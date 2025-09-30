@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'form_style.dart';
 
 class FormDosen extends StatefulWidget {
   const FormDosen({super.key});
@@ -8,14 +9,21 @@ class FormDosen extends StatefulWidget {
 }
 
 class _FormDosenState extends State<FormDosen> {
-  final _formKey = GlobalKey<FormState>();
   final TextEditingController nidnController = TextEditingController();
-  final TextEditingController namaController = TextEditingController();
-  final TextEditingController homebaseController = TextEditingController();
+  final TextEditingController namaDosenController = TextEditingController();
+  final TextEditingController homeBaseController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController notlpController = TextEditingController();
+  final TextEditingController telpController = TextEditingController();
 
-  String output = "";
+  @override
+  void dispose() {
+    nidnController.dispose();
+    namaDosenController.dispose();
+    homeBaseController.dispose();
+    emailController.dispose();
+    telpController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,43 +31,44 @@ class _FormDosenState extends State<FormDosen> {
       appBar: AppBar(title: const Text("Form Dosen")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
+        child: SingleChildScrollView(
           child: Column(
             children: [
               TextFormField(
                 controller: nidnController,
-                decoration: const InputDecoration(labelText: "NIDN"),
+                decoration: FormStyle.inputDecoration("NIDN"),
               ),
+              const SizedBox(height: 16),
               TextFormField(
-                controller: namaController,
-                decoration: const InputDecoration(labelText: "Nama Dosen"),
+                controller: namaDosenController,
+                decoration: FormStyle.inputDecoration("Nama Dosen"),
               ),
+              const SizedBox(height: 16),
               TextFormField(
-                controller: homebaseController,
-                decoration: const InputDecoration(labelText: "Home Base"),
+                controller: homeBaseController,
+                decoration: FormStyle.inputDecoration("Home Base"),
               ),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: emailController,
-                decoration: const InputDecoration(labelText: "Email"),
+                decoration: FormStyle.inputDecoration("Email"),
               ),
+              const SizedBox(height: 16),
               TextFormField(
-                controller: notlpController,
-                decoration: const InputDecoration(labelText: "No Telepon"),
+                controller: telpController,
+                decoration: FormStyle.inputDecoration("No Telepon"),
                 keyboardType: TextInputType.phone,
               ),
               const SizedBox(height: 20),
               ElevatedButton(
+                style: FormStyle.buttonStyle(),
                 onPressed: () {
-                  setState(() {
-                    output =
-                        "NIDN: ${nidnController.text}\nNama: ${namaController.text}\nHome Base: ${homebaseController.text}\nEmail: ${emailController.text}\nNo Tlp: ${notlpController.text}";
-                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Data Dosen Disimpan")),
+                  );
                 },
                 child: const Text("Simpan"),
               ),
-              const SizedBox(height: 20),
-              Text(output),
             ],
           ),
         ),
